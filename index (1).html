@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <script type="module" src="script.js"></script>
+
+<div class="box_right">
+    <div class="box_right_content">
+        <div class="box_container">
+            <div class="box_container_left" style="width: 100%;">
+                <div class="title">
+                    <span class="text"><i class="fa fa-th"></i> Thêm booking mới</span>
+                    <!-- <a href="" class="plus"><i class="fa-solid fa-square-plus fa-rotate-180"></i>Thêm hàng loạt</a> -->
+                    <div>
+                        <button id="bulkAddBtn" class="btn btn-primary">Thêm hàng loạt</button>
+                    </div>
+                      <div id="bulkAddModal" class="modal">
+                        <div class="modal-content">
+                          <span class="close">&times;</span>
+                          <h2>Thêm hàng loạt đơn hàng</h2>
+                          <form id="bulkAddForm" action="/PHPExcel/import_booking.php" method="post" enctype="multipart/form-data">
+                            <label for="file">Chọn file CSV/Excel: </label>
+                            <input type="file" id="fileUpload" name="file" accept=".csv, .xlsx" required>
+                            <button type="submit" class="btn btn-success">Tải lên</button>
+                          </form>
+                          <div id="previewContainer"></div>
+                        </div>
+                      </div>
+                </div> 
+                
+                <style>
+                   
+            .modal {
+              display: none; 
+              position: fixed;
+              top: 50%;
+              left: 55%;
+              transform: translate(-50%, -50%);
+              width: 36%;
+              background-color: white;
+              box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+              z-index: 1000;
+              text-align: center;
+            }
+            
+            .modal .modal-content {
+              position: relative;
+              padding: 20px;
+            }
+            .modal .modal-content form{
+                
+            }
+            .modal .modal-content form .btn{
+              
+                margin: 10px auto;
+                display: flex;
+                justify-content: center;
+            } 
+            .close {
+              position: absolute;
+              top: 10px;
+              right: 20px;
+              cursor: pointer;
+            }
+                </style>
+                
+                  <script>
+             // Sử dụng querySelector để lấy các phần tử
+            const bulkAddBtn = document.querySelector('#bulkAddBtn');
+            const bulkAddModal = document.querySelector('#bulkAddModal');
+            const closeBtn = document.querySelector('.close');
+            
+            // Tạo overlay sử dụng querySelector
+            const modalOverlay = document.createElement('div');
+            modalOverlay.classList.add('modal-overlay');
+            document.body.appendChild(modalOverlay);
+            
+            // Sử dụng addEventListener với querySelector
+            bulkAddBtn.addEventListener('click', () => {
+              bulkAddModal.style.display = 'block';  // Hiển thị modal
+              modalOverlay.style.display = 'block';  // Hiển thị overlay
+            });
+            
+            // Đóng modal khi nhấn vào nút "X" hoặc overlay
+            closeBtn.addEventListener('click', () => {
+              bulkAddModal.style.display = 'none';   // Ẩn modal
+              modalOverlay.style.display = 'none';   // Ẩn overlay
+            });
+            
+            modalOverlay.addEventListener('click', () => {
+              bulkAddModal.style.display = 'none';   // Ẩn modal
+              modalOverlay.style.display = 'none';   // Ẩn overlay
+            });
+            
+            
+                  </script>  
+                <div class="box_form">
+                    <div class="list_tab">
+                        <div class="li_tab active" id="tab_hangxuat">Hàng xuất</div>
+                        <div class="li_tab" id="tab_hangnhap">Hàng nhập</div>
+                        <div class="li_tab" id="tab_noidia">Hàng nội địa</div>
+                    </div>
+                    <div class="list_tab_content">
+                        <div class="li_tab_content active" id="tab_hangxuat_content">
+                            <div class="col_input col_2">
+                                <div class="li_input">
+                                    <label>Số booking(*)</label>
+                                    <input type="text" name="so_booking" placeholder="Nhập số booking"
+                                        autocomplete="off">
+                                </div>
+                                <div class="li_input"
+                                    style="display:flex;align-items: center;justify-content: space-between;">
+                                    <div class="box_file_booking">
+                                        <label>File booking</label>
+                                        <div class="khung_file">
+                                            <input type="file" name="file_booking">
+                                            <button class="chon_file">Chọn file</button>
+                                            <div class="file_name">Chưa chọn file nào!</div>
+                                        </div>
+                                    </div>
+  
+                                    <!-- <div class="box_phanloai_kieu">
+                                        <button class="vantai_truyenthong" value="vantai_truyenthong">Vận tải <br>truyền thống</button>
+                                        <button class="vantai_kethop" value="vantai_kethop">Vận tải <br> kết hợp</button>
+                                    </div> -->
+  
+  
+                                    <div class="box_phanloai_kieu" >
+                                        <div class="vantai">
+                                            <input type="radio"  name="option" value="vantai_truyenthong" id="option1" checked>
+                                            <label for="option1">Vận tải truyền thống</label>
+                                        </div>
+                                        <div class="vantai">
+                                            <input type="radio" name="option" value="vantai_kethop" id="option2">
+                                            <label for="option2">Vận tải kết hợp</label>
+                                        </div>                                 
+                                    </div>
+                                </div>
+                            </div>
+  
+  
+                            <div class="col_input col_2">
+                                <div class="li_input">
+                                    <label>Hãng tàu(*)</label>
+                                    <input type="text" name="hang_tau" value="" ten="" placeholder="Nhập tên hãng tàu">
+                                    <input type="hidden" name="hang_tau_id">
+                                    <div class="list_goiy list_goiy_hangtau">{list_hangtau}</div>
+                                </div>
+                                <div class="li_input">
+                                    <label>Loại container(*)</label>
+                                    <select name="loai_container">
+                                        <option value="">Chọn loại container</option>
+                                        {option_container}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="li_input">
+                                <label>Địa chỉ đóng hàng(*)</label>
+                                <input type="text" name="diachi_donghang" placeholder="Nhập địa chỉ đóng hàng"
+                                    autocomplete="off">
+                            </div>
+                            <div class="col_input col_3">
+                                <div class="li_input">
+                                    <label>Tỉnh/TP(*)</label>
+                                    <input type="text" name="tinh" value="" ten="" placeholder="Nhập tên tỉnh">
+                                    <input type="hidden" name="tinh_id">
+                                    <div class="list_goiy list_goiy_tinh">{list_tinh}</div>
+                                </div>
+                                <div class="li_input">
+                                    <label>Quận/Huyện(*)</label>
+                                    <select name="huyen">
+                                        <option value="">Chọn quận/huyện</option>
+                                    </select>
+                                </div>
+                                <div class="li_input">
+                                    <label>Xã/Thị Trấn(*)</label>
+                                    <select name="xa">
+                                        <option value="">Chọn xã/thị trấn</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="li_input">
+                                <label>Địa chỉ trả hàng(*)</label>
+                                <select name="diachi_trahang">
+                                    <option value="">Chọn cảng</option>
+                                    {option_cang}
+                                </select>
+                            </div>
+                            <div class="li_input">
+                                <label>Mặt hàng(*)</label>
+                                <div class="list_checkbox">
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="May mặc">
+                                        <label>May mặc</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Thực phẩm">
+                                        <label>Thực phẩm</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Thiết bị điện tử">
+                                        <label>Thiết bị điện tử</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Linh kiện">
+                                        <label>Linh kiện</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Máy móc">
+                                        <label>Máy móc</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Nguyên vật liệu">
+                                        <label>Nguyên vật liệu</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="khac">
+                                        <label class="khac">Khác</label>
+                                        <input type="text" class="khac" name="mat_hang_khac"
+                                            placeholder="Nhập tên mặt hàng khác">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col_input col_3">
+                                <div class="li_input">
+                                    <label>Số lượng container(*)</label>
+                                    <input type="number" name="so_luong" class="sl_container"
+                                        placeholder="Nhập số lượng container" autocomplete="off">
+                                </div>                             
+                                <div class="li_input">
+                                    <label>Trọng lượng/container(*)</label>
+                                    <input type="number" name="trong_luong" placeholder="Đơn vị tấn" autocomplete="off">
+                                </div>
+                                <div class="li_input">
+                                    <label>Cước vận chuyển/container(*)</label>
+                                    <input type="text" name="gia" class="price_format"
+                                        placeholder="Nhập cước vận chuyển cho 1 container" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="li_input" id="input_container" style="display: none;">
+                                <label>Danh sách container(*)</label>
+                                <div class="list_container"></div>
+                            </div>
+                            <div class="li_input">
+                                <label>Kết hợp hãng tàu</label>
+                                <div class="list_kh">
+                                    <div class="li_kh"><input type="radio" name="ket_hop" checked="checked" value="0"
+                                            id="ket_hop_0"> <label for="ket_hop_0">Tôi tự xin kết hợp</label></div>
+                                    <div class="li_kh"><input type="radio" name="ket_hop" value="1" id="ket_hop_1">
+                                        <label for="ket_hop_1">KNVC kết hợp hãng tàu <span
+                                                class="phi_kethop">1.000.000đ</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="li_input">
+                                <label>
+                                    Ghi chú
+                                </label>
+                                <textarea name="ghi_chu" placeholder="Nội dung ghi chú" autocomplete="off"></textarea>
+                            </div>
+                            <div class="list_button">
+                                <button name="add_hangxuat">Lưu booking</button>
+                            </div>
+                        </div>
+                        <div class="li_tab_content" id="tab_hangnhap_content">
+                            <div class="col_input col_2">
+                                <div class="li_input">  
+                                    <label>Số booking(*)</label>
+                                    <input type="text" name="so_booking" placeholder="Nhập số booking"
+                                        autocomplete="off" >
+                                </div>
+                    
+                                <div class="li_input"style="display:flex;align-items: center;justify-content: space-between;">
+                                    <div class="box_file_booking">
+                                        <label>File booking</label>
+                                        <div class="khung_file">
+                                            <input type="file" name="file_booking">
+                                            <button class="chon_file">Chọn file</button>
+                                            <div class="file_name">Chưa chọn file nào!</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="box_phanloai_kieu"  style="display: flex; text-align: left; padding: 5px; width: 550px;">
+                                        <div class="vantai">
+                                            <input type="radio"  name="option" value="vantai_truyenthong" id="option1" checked>
+                                            <label for="option1">Vận tải truyền thống</label>
+                                        </div>
+                                        <div class="vantai">
+                                            <input type="radio" name="option" value="vantai_kethop" id="option2">
+                                            <label for="option2">Vận tải kết hợp</label>
+                                        </div>
+                                        <div class="vantai">
+                                            <input type="radio" name="option" value="banvo_kethop" id="option3">
+                                            <label for="option2">Bán vỏ kết hợp</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col_input col_2">
+                                <div class="li_input">
+                                    <label>Hãng tàu(*)</label>
+                                    <input type="text" name="hang_tau" value="" ten="" placeholder="Nhập tên hãng tàu">
+                                    <input type="hidden" name="hang_tau_id">
+                                    <div class="list_goiy list_goiy_hangtau">{list_hangtau}</div>
+                                </div>
+                                <div class="li_input">
+                                    <label>Loại container(*)</label>
+                                    <select name="loai_container">
+                                        <option value="">Chọn loại container</option>
+                                        {option_container}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="li_input">
+                                <label>Địa chỉ đóng hàng(*)</label>
+                                <select name="diachi_donghang">
+                                    <option value="">Chọn cảng</option>
+                                    {option_cang}
+                                </select>
+                            </div>
+                            <div class="li_input">
+                                <label>Địa chỉ trả hàng(*)</label>
+                                <input type="text" name="diachi_trahang" placeholder="Nhập địa chỉ trả hàng"
+                                    autocomplete="off">
+                            </div>
+  
+                            
+                            <div class="col_input col_3">
+                                <div class="li_input">
+                                    <label>Tỉnh/TP(*)</label>
+                                    <input type="text" name="tinh" value="" ten="" placeholder="Nhập tên tỉnh">
+                                    <input type="hidden" name="tinh_id">
+                                    <div class="list_goiy list_goiy_tinh">{list_tinh}</div>
+                                </div>
+                                <div class="li_input">
+                                    <label>Quận/Huyện(*)</label>
+                                    <select name="huyen">
+                                        <option value="">Chọn quận/huyện</option>
+                                    </select>
+                                </div>
+                                <div class="li_input">
+                                    <label>Xã/Thị Trấn(*)</label>
+                                    <select name="xa">
+                                        <option value="">Chọn xã/thị trấn</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="li_input">
+                                <label>Mặt hàng(*)</label>
+                                <div class="list_checkbox">
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="May mặc">
+                                        <label>May mặc</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Thực phẩm">
+                                        <label>Thực phẩm</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Thiết bị điện tử">
+                                        <label>Thiết bị điện tử</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Linh kiện">
+                                        <label>Linh kiện</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Máy móc">
+                                        <label>Máy móc</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Nguyên vật liệu">
+                                        <label>Nguyên vật liệu</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="khac">
+                                        <label class="khac">Khác</label>
+                                        <input type="text" class="khac" name="mat_hang_khac"
+                                            placeholder="Nhập tên mặt hàng khác">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col_input col_2">
+                                <div class="li_input">
+                                    <label>Số lượng container(*)</label>
+                                    <input type="number" name="so_luong" class="sl_container"
+                                        placeholder="Nhập số lượng container" autocomplete="off">
+                                </div>
+                                <div class="li_input">
+                                    <label>Trọng lượng/container(*)</label>
+                                    <input type="number" name="trong_luong" placeholder="Đơn vị tấn" autocomplete="off">
+                                </div>
+                                <div class="li_input" id="input_cuoc">
+                                    <label>Cước vận chuyển/container(*)</label>
+                                    <input type="text" name="gia" class="price_format"
+                                        placeholder="Nhập cước vận chuyển cho 1 container" autocomplete="off">
+                                </div>
+                                <div class="li_input">
+                                    <label>Hạn trả rỗng(*)</label>
+                                    <input type="text" name="han_tra_rong"  class="datepicker" placeholder="Hạn trả rỗng"
+                                        autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="li_input" id="input_container" style="display: none;">
+                                <label>Danh sách container(*)</label>
+                                <div class="list_container"></div>
+                            </div>
+                            <div class="li_input">
+                                <label>Ghi chú</label>
+                                <textarea name="ghi_chu" placeholder="Nội dung ghi chú" autocomplete="off"></textarea>
+                            </div>
+                            <div class="list_button">
+                                <button name="add_hangnhap">Lưu booking</button>
+                            </div>
+                        </div>
+                        <div class="li_tab_content" id="tab_noidia_content">
+                            <div class="col_input">
+                                <div class="li_input">
+                                    <label>Loại container(*)</label>
+                                    <select name="loai_container">
+                                        <option value="">Chọn loại container</option>
+                                        {option_container}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="li_input">
+                                <label>Địa chỉ đóng hàng(*)</label>
+                                <input type="text" name="diachi_donghang" placeholder="Nhập địa chỉ đóng hàng"
+                                    autocomplete="off">
+                            </div>
+                            <div class="col_input col_3">
+                                <div class="li_input">
+                                    <label>Tỉnh/TP đóng hàng(*)</label>
+                                    <input type="text" name="tinh_donghang" value="" ten="" placeholder="Nhập tên tỉnh">
+                                    <input type="hidden" name="tinh_donghang_id">
+                                    <div class="list_goiy list_goiy_tinh_donghang">{list_tinh}</div>
+                                </div>
+                                <div class="li_input">
+                                    <label>Quận/Huyện đóng hàng(*)</label>
+                                    <select name="huyen_donghang">
+                                        <option value="">Chọn quận/huyện</option>
+                                    </select>
+                                </div>
+                                <div class="li_input">
+                                    <label>Xã/Thị Trấn đóng hàng(*)</label>
+                                    <select name="xa_donghang">
+                                        <option value="">Chọn xã/thị trấn</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="li_input">
+                                <label>Địa chỉ trả hàng(*)</label>
+                                <input type="text" name="diachi_trahang" placeholder="Nhập địa chỉ trả hàng"
+                                    autocomplete="off">
+                            </div>
+                            <div class="col_input col_3">
+                                <div class="li_input">
+                                    <label>Tỉnh/TP trả hàng(*)</label>
+                                    <input type="text" name="tinh" value="" ten="" placeholder="Nhập tên tỉnh">
+                                    <input type="hidden" name="tinh_id">
+                                    <div class="list_goiy list_goiy_tinh">{list_tinh}</div>
+                                </div>
+                                <div class="li_input">
+                                    <label>Quận/Huyện trả hàng(*)</label>
+                                    <select name="huyen">
+                                        <option value="">Chọn quận/huyện</option>
+                                    </select>
+                                </div>
+                                <div class="li_input">
+                                    <label>Xã/Thị Trấn trả hàng(*)</label>
+                                    <select name="xa">
+                                        <option value="">Chọn xã/thị trấn</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="li_input">
+                                <label>Mặt hàng(*)</label>
+                                <div class="list_checkbox">
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="May mặc">
+                                        <label>May mặc</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Thực phẩm">
+                                        <label>Thực phẩm</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Thiết bị điện tử">
+                                        <label>Thiết bị điện tử</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Linh kiện">
+                                        <label>Linh kiện</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Máy móc">
+                                        <label>Máy móc</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="Nguyên vật liệu">
+                                        <label>Nguyên vật liệu</label>
+                                    </div>
+                                    <div class="li_checkbox">
+                                        <input type="radio" name="mat_hang" value="khac">
+                                        <label class="khac">Khác</label>
+                                        <input type="text" class="khac" name="mat_hang_khac"
+                                            placeholder="Nhập tên mặt hàng khác">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col_input col_2">
+                                <div class="li_input">
+                                    <label>Số lượng container(*)</label>
+                                    <input type="number" name="so_luong" class="sl_container"
+                                        placeholder="Nhập số lượng container" autocomplete="off">
+                                </div>
+                                <div class="li_input">
+                                    <label>Trọng lượng/container(*)</label>
+                                    <input type="number" name="trong_luong" placeholder="Đơn vị tấn" autocomplete="off">
+                                </div>
+                                <div class="li_input">
+                                    <label>Cước vận chuyển/container(*)</label>
+                                    <input type="text" name="gia" class="price_format"
+                                        placeholder="Nhập cước vận chuyển cho 1 container" autocomplete="off">
+                                </div>
+                                <div class="li_input">
+                                    <label>Hạn trả rỗng(*)</label>
+                                    <input type="text" name="han_tra_rong"  class="datepicker" placeholder="Hạn trả rỗng"
+                                        autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="li_input" id="input_container" style="display: none;">
+                                <label>Danh sách container(*)</label>
+                                <div class="list_container"></div>
+                            </div>
+                            <div class="li_input">
+                                <label>Ghi chú</label>
+                                <textarea name="ghi_chu" placeholder="Nội dung ghi chú" autocomplete="off"></textarea>
+                            </div>
+                            <div class="list_button">
+                                <button name="add_hang_noidia">Lưu booking</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/skin/css/jquery.timepicker.css">
+  <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="/js/jquery.timepicker.js"></script>
+  <script type="text/javascript" src="/js/jquery.priceformat.min.js"></script>
+  <script type="text/javascript" src="/js/demo_price.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+        $(".datepicker").datepicker({ dateFormat: 'dd/mm/yy', changeMonth: true, changeYear: true });
+        $('input.timepicker').timepicker({ 'timeFormat': 'H:i:s', 'step': 5 });
+        $.datepicker.setDefaults({
+            closeText: "Đóng",
+            prevText: "&#x3C;Trước",
+            nextText: "Tiếp&#x3E;",
+            currentText: "Hôm nay",
+            monthNames: ["Tháng Một", "Tháng Hai", "Tháng Ba", "Tháng Tư", "Tháng Năm", "Tháng Sáu",
+                "Tháng Bảy", "Tháng Tám", "Tháng Chín", "Tháng Mười", "Tháng Mười Một", "Tháng Mười Hai"
+            ],
+            monthNamesShort: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
+                "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
+            ],
+            dayNames: ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"],
+            dayNamesShort: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+            dayNamesMin: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+            weekHeader: "Tu",
+            firstDay: 0,
+            isRTL: false,
+            showMonthAfterYear: false,
+            yearSuffix: ""
+        });
+    })
+  </script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+        document.addEventListener("DOMContentLoaded", function () {
+            var table = document.querySelector("table");
+  
+            table.addEventListener("scroll", function () {
+                var leftStickyColumn = document.querySelector(".sticky-column");
+                leftStickyColumn.style.transform = "translateX(" + (table.scrollLeft - 1) + "px)";
+            });
+        });
+        total_height = 0;
+        $('.box_menu_left .menu_li, .box_menu_left .menu_header').each(function () {
+            total_height += $(this).outerHeight();
+            if ($(this).attr('id') == 'menu_quanly_booking') {
+                $(this).find('span i').removeClass('fa-plus-circle');
+                $(this).find('span i').addClass('fa-minus-circle');
+                vitri = total_height - 90;
+                $('.menu_li.menu_quanly_booking').show();
+            } else {
+                if ($(this).find('span i').length > 0) {
+                    $(this).find('span i').removeClass('fa-minus-circle');
+                    $(this).find('span i').addClass('fa-plus-circle');
+                    $('.menu_li.' + $(this).attr('id')).hide();
+                }
+            }
+        });
+        $('.box_menu_left').animate({ scrollTop: vitri }, 1000);
+    });
+  </script>
+</body>
+</html>
