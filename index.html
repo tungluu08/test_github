@@ -7,7 +7,26 @@
     <title>Document</title>
 </head>
 <body>
-    
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('export')">Hàng xuất</button>
+            <button class="tab-button" onclick="showTab('import')">Hàng nhập</button>
+            <button class="tab-button" onclick="showTab('domestic')">Hàng nội địa</button>
+        </div>
+        <div class="tab-content active" id="export">
+            <!-- Form for Export Tab -->
+            <form class="form">
+                <div class="form-group">
+                    <label>Số booking(*)</label>
+                    <input type="text" placeholder="Nhập số booking">
+                </div>
+                <div class="form-group">
+                    <label>Hãng tàu(*)</label>
+                    <input type="text" placeholder="Nhập tên hãng tàu">
+                </div>
+            </form>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
