@@ -12,3 +12,4 @@ CREATE TABLE IF NOT EXISTS booking (
     booking_type ENUM('export', 'import', 'domestic') NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+--oi zoi oi
